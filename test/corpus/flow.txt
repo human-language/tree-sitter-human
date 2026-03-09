@@ -1,0 +1,67 @@
+===
+multi step flow
+===
+FLOW greet
+  greet the customer
+  ask how you can help
+  wait for response
+---
+(source_file
+  (flow_block
+    name: (identifier)
+    (flow_step
+      (step_text))
+    (flow_step
+      (step_text))
+    (flow_step
+      (step_text))))
+
+===
+single step flow
+===
+FLOW ack
+  acknowledge the request
+---
+(source_file
+  (flow_block
+    name: (identifier)
+    (flow_step
+      (step_text))))
+
+===
+comments inside flow
+===
+FLOW close
+  # wind down
+  ask if there is anything else
+  # farewell
+  thank the customer
+---
+(source_file
+  (flow_block
+    name: (identifier)
+    (comment)
+    (flow_step
+      (step_text))
+    (comment)
+    (flow_step
+      (step_text))))
+
+===
+multiple flow blocks
+===
+FLOW open
+  greet the user
+
+FLOW close
+  say goodbye
+---
+(source_file
+  (flow_block
+    name: (identifier)
+    (flow_step
+      (step_text)))
+  (flow_block
+    name: (identifier)
+    (flow_step
+      (step_text))))

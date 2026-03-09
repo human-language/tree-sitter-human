@@ -1,0 +1,10 @@
+AGENT config_demo
+  SYSTEM ./system.md
+  model = "gpt-4"
+  temperature = 0.7
+  max_tokens = 1024
+  verbose = true
+  debug = false
+  offset = -1
+  bias = -0.5
+  config = ./config.json

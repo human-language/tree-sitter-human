@@ -1,0 +1,105 @@
+===
+input and expect contains
+===
+TEST
+  INPUT "hello"
+  EXPECT CONTAINS "greeting"
+---
+(source_file
+  (test_block
+    (test_input
+      (string
+        (string_content)))
+    (test_expect
+      (string
+        (string_content)))))
+
+===
+expect not contains
+===
+TEST
+  INPUT "help me"
+  EXPECT NOT CONTAINS "error"
+---
+(source_file
+  (test_block
+    (test_input
+      (string
+        (string_content)))
+    (test_expect
+      (string
+        (string_content)))))
+
+===
+expect matches
+===
+TEST
+  INPUT "test"
+  EXPECT MATCHES "ok"
+---
+(source_file
+  (test_block
+    (test_input
+      (string
+        (string_content)))
+    (test_expect
+      (string
+        (string_content)))))
+
+===
+expect not matches
+===
+TEST
+  INPUT "bad input"
+  EXPECT NOT MATCHES "fatal"
+---
+(source_file
+  (test_block
+    (test_input
+      (string
+        (string_content)))
+    (test_expect
+      (string
+        (string_content)))))
+
+===
+multiple inputs and expects
+===
+TEST
+  INPUT "question one"
+  EXPECT CONTAINS "answer"
+  INPUT "question two"
+  EXPECT NOT CONTAINS "error"
+---
+(source_file
+  (test_block
+    (test_input
+      (string
+        (string_content)))
+    (test_expect
+      (string
+        (string_content)))
+    (test_input
+      (string
+        (string_content)))
+    (test_expect
+      (string
+        (string_content)))))
+
+===
+comment inside test block
+===
+TEST
+  # first case
+  INPUT "hello"
+  EXPECT CONTAINS "hi"
+---
+(source_file
+  (test_block
+    (comment)
+    (test_input
+      (string
+        (string_content)))
+    (test_expect
+      (string
+        (string_content)))))

@@ -13,6 +13,8 @@ typedef struct {
   uint16_t stack[MAX_DEPTH];
   uint8_t depth;
   uint8_t queued_dedents;
+  uint16_t pending_indent;
+  bool has_pending;
 } Scanner;
 
 void *tree_sitter_hmn_external_scanner_create(void) {
@@ -31,6 +33,9 @@ unsigned tree_sitter_hmn_external_scanner_serialize(void *payload, char *buffer)
   unsigned n = 0;
   buffer[n++] = (char)s->depth;
   buffer[n++] = (char)s->queued_dedents;
+  buffer[n++] = (char)(s->pending_indent & 0xFF);
+  buffer[n++] = (char)(s->pending_indent >> 8);
+  buffer[n++] = (char)s->has_pending;
   for (uint8_t i = 0; i < s->depth && n + 1 < TREE_SITTER_SERIALIZATION_BUFFER_SIZE; i++) {
     buffer[n++] = (char)(s->stack[i] & 0xFF);
     buffer[n++] = (char)(s->stack[i] >> 8);
@@ -45,10 +50,16 @@ void tree_sitter_hmn_external_scanner_deserialize(
   s->stack[0] = 0;
   s->depth = 1;
   s->queued_dedents = 0;
-  if (length < 2) return;
+  s->pending_indent = 0;
+  s->has_pending = false;
+  if (length < 5) return;
   unsigned p = 0;
   s->depth = (uint8_t)buffer[p++];
   s->queued_dedents = (uint8_t)buffer[p++];
+  s->pending_indent = (uint16_t)((unsigned char)buffer[p] |
+                                  ((unsigned char)buffer[p + 1] << 8));
+  p += 2;
+  s->has_pending = (bool)buffer[p++];
   if (s->depth > MAX_DEPTH) s->depth = MAX_DEPTH;
   for (uint8_t i = 0; i < s->depth && p + 1 < length; i++) {
     s->stack[i] = (uint16_t)((unsigned char)buffer[p] |
@@ -71,81 +82,11 @@ bool tree_sitter_hmn_external_scanner_scan(
     return true;
   }
 
-  /* 2. At EOF, close open blocks. */
-  if (lexer->eof(lexer)) {
-    if (valid_symbols[DEDENT] && s->depth > 1) {
-      s->depth--;
-      lexer->result_symbol = DEDENT;
-      return true;
-    }
-    if (valid_symbols[NEWLINE]) {
-      lexer->result_symbol = NEWLINE;
-      return true;
-    }
-    return false;
-  }
-
-  /* 3. Must be sitting on a newline to proceed. */
-  if (lexer->lookahead != '\n' && lexer->lookahead != '\r')
-    return false;
-  if (!valid_symbols[NEWLINE] && !valid_symbols[INDENT] && !valid_symbols[DEDENT])
-    return false;
-
-  /*
-   * Consume the newline. We use advance(false) so the token has
-   * nonzero width and tree-sitter knows progress was made.
-   */
-  if (lexer->lookahead == '\r') {
-    lexer->advance(lexer, false);
-    if (lexer->lookahead == '\n') lexer->advance(lexer, false);
-  } else {
-    lexer->advance(lexer, false);
-  }
-
-  /*
-   * Now look ahead to find the indent level of the next non-blank line.
-   * We DON'T call mark_end yet -- if we decide to emit INDENT or DEDENT
-   * instead of NEWLINE, the token still starts from the \n we consumed.
-   * After deciding, mark_end will be placed right after the \n (before
-   * any spaces we peeked past), unless we consumed more blank lines.
-   */
-
-  int guard = 0;
-  for (;;) {
-    if (lexer->eof(lexer) || ++guard > 5000) break;
-
-    /* Count leading spaces. */
-    uint16_t indent = 0;
-    while (lexer->lookahead == ' ') {
-      indent++;
-      lexer->advance(lexer, false);
-    }
-    /* Skip tabs (shouldn't be used but be safe). */
-    while (lexer->lookahead == '\t') {
-      lexer->advance(lexer, false);
-    }
-
-    if (lexer->eof(lexer)) break;
-
-    /* Blank line -- consume newline and keep going. */
-    if (lexer->lookahead == '\n' || lexer->lookahead == '\r') {
-      if (lexer->lookahead == '\r') {
-        lexer->advance(lexer, false);
-        if (lexer->lookahead == '\n') lexer->advance(lexer, false);
-      } else {
-        lexer->advance(lexer, false);
-      }
-      continue;
-    }
-
-    /*
-     * Found a non-blank line. `indent` is the number of leading spaces.
-     * Mark end here -- the token encompasses everything from the
-     * original \n through any blank lines and the leading spaces.
-     */
-    lexer->mark_end(lexer);
-
+  /* 2. Emit pending INDENT/DEDENT from a previous NEWLINE scan. */
+  if (s->has_pending) {
+    uint16_t indent = s->pending_indent;
     uint16_t current = s->stack[s->depth - 1];
+    s->has_pending = false;
 
     if (indent > current && valid_symbols[INDENT]) {
       if (s->depth < MAX_DEPTH) {
@@ -169,24 +110,88 @@ bool tree_sitter_hmn_external_scanner_scan(
       return true;
     }
 
+    /* Same indent level -- no token to emit. */
+    return false;
+  }
+
+  /* 3. At EOF, close open blocks. */
+  if (lexer->eof(lexer)) {
+    if (valid_symbols[DEDENT] && s->depth > 1) {
+      s->depth--;
+      lexer->result_symbol = DEDENT;
+      return true;
+    }
     if (valid_symbols[NEWLINE]) {
       lexer->result_symbol = NEWLINE;
       return true;
     }
-
     return false;
+  }
+
+  /* 4. Must be sitting on a newline to proceed. */
+  if (lexer->lookahead != '\n' && lexer->lookahead != '\r')
+    return false;
+  if (!valid_symbols[NEWLINE])
+    return false;
+
+  /* Consume the newline character(s). */
+  if (lexer->lookahead == '\r') {
+    lexer->advance(lexer, false);
+    if (lexer->lookahead == '\n') lexer->advance(lexer, false);
+  } else {
+    lexer->advance(lexer, false);
+  }
+
+  /*
+   * Look ahead to find the indent level of the next non-blank line.
+   * We skip blank lines entirely (consume them into this NEWLINE token).
+   */
+  int guard = 0;
+  for (;;) {
+    if (lexer->eof(lexer) || ++guard > 5000) break;
+
+    /* Count leading spaces. */
+    uint16_t indent = 0;
+    while (lexer->lookahead == ' ') {
+      indent++;
+      lexer->advance(lexer, false);
+    }
+    while (lexer->lookahead == '\t') {
+      lexer->advance(lexer, false);
+    }
+
+    if (lexer->eof(lexer)) break;
+
+    /* Blank line -- consume newline and keep going. */
+    if (lexer->lookahead == '\n' || lexer->lookahead == '\r') {
+      if (lexer->lookahead == '\r') {
+        lexer->advance(lexer, false);
+        if (lexer->lookahead == '\n') lexer->advance(lexer, false);
+      } else {
+        lexer->advance(lexer, false);
+      }
+      continue;
+    }
+
+    /*
+     * Found a non-blank line. Record the indent for the NEXT scan call
+     * and emit NEWLINE now. The INDENT/DEDENT will be emitted on the
+     * next call via the pending mechanism.
+     */
+    lexer->mark_end(lexer);
+
+    uint16_t current = s->stack[s->depth - 1];
+    if (indent != current) {
+      s->pending_indent = indent;
+      s->has_pending = true;
+    }
+
+    lexer->result_symbol = NEWLINE;
+    return true;
   }
 
   /* EOF after skipping blank lines. */
   lexer->mark_end(lexer);
-  if (valid_symbols[DEDENT] && s->depth > 1) {
-    s->depth--;
-    lexer->result_symbol = DEDENT;
-    return true;
-  }
-  if (valid_symbols[NEWLINE]) {
-    lexer->result_symbol = NEWLINE;
-    return true;
-  }
-  return false;
+  lexer->result_symbol = NEWLINE;
+  return true;
 }

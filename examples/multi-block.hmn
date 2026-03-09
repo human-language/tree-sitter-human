@@ -1,0 +1,26 @@
+AGENT multi
+  SYSTEM ./system.md
+
+CONSTRAINTS safety
+  NEVER lie
+  MUST be honest
+
+CONSTRAINTS tone
+  SHOULD be friendly
+  AVOID sarcasm
+
+FLOW greet
+  greet the customer
+  ask how you can help
+
+FLOW close
+  ask if there is anything else
+  thank the customer
+
+TEST
+  INPUT "hello"
+  EXPECT CONTAINS "hi"
+
+TEST
+  INPUT "goodbye"
+  EXPECT CONTAINS "bye"

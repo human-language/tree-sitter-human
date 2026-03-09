@@ -1,0 +1,42 @@
+===
+top level comment
+===
+# this is a comment
+AGENT bot
+---
+(source_file
+  (comment)
+  (agent_declaration
+    name: (identifier)))
+
+===
+comment between blocks
+===
+AGENT bot
+
+# constraints follow
+CONSTRAINTS safety
+  NEVER lie
+---
+(source_file
+  (agent_declaration
+    name: (identifier))
+  (comment)
+  (constraints_block
+    name: (identifier)
+    (constraint
+      (constraint_level)
+      (constraint_text))))
+
+===
+multiple comments
+===
+# file header
+# version 1
+AGENT bot
+---
+(source_file
+  (comment)
+  (comment)
+  (agent_declaration
+    name: (identifier)))

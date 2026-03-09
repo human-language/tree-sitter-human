@@ -1,0 +1,66 @@
+===
+full support bot
+===
+IMPORT ./rules.hmn
+IMPORT ./flows.hmn
+
+AGENT support_bot
+SYSTEM ./system.md
+
+CONSTRAINTS response
+  MUST respond within 2 sentences for simple questions
+  NEVER leave the customer waiting without acknowledgment
+  SHOULD end with a clear next step
+
+FLOW close
+  ask if there is anything else
+  thank the customer
+  end the conversation
+
+TEST
+  INPUT "I need help with my bill"
+  EXPECT CONTAINS "billing"
+  INPUT "Where is my package?"
+  EXPECT NOT CONTAINS "error"
+---
+(source_file
+  (import_statement
+    (path))
+  (import_statement
+    (path))
+  (agent_declaration
+    name: (identifier))
+  (system_directive
+    path: (path))
+  (constraints_block
+    name: (identifier)
+    (constraint
+      (constraint_level)
+      (constraint_text))
+    (constraint
+      (constraint_level)
+      (constraint_text))
+    (constraint
+      (constraint_level)
+      (constraint_text)))
+  (flow_block
+    name: (identifier)
+    (flow_step
+      (step_text))
+    (flow_step
+      (step_text))
+    (flow_step
+      (step_text)))
+  (test_block
+    (test_input
+      (string
+        (string_content)))
+    (test_expect
+      (string
+        (string_content)))
+    (test_input
+      (string
+        (string_content)))
+    (test_expect
+      (string
+        (string_content)))))

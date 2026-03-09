@@ -1,0 +1,25 @@
+# file header
+IMPORT ./rules.hmn
+# after import
+
+AGENT bot
+  # agent config
+  model = "gpt-4"
+
+# between blocks
+CONSTRAINTS safety
+  # first rule
+  NEVER lie
+  # second rule
+  MUST be honest
+
+FLOW greet
+  # opening
+  greet the customer
+  # closing
+  say goodbye
+
+TEST
+  # test case
+  INPUT "hello"
+  EXPECT CONTAINS "hi"

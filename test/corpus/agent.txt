@@ -1,0 +1,83 @@
+===
+minimal agent
+===
+AGENT bot
+---
+(source_file
+  (agent_declaration
+    name: (identifier)))
+
+===
+agent with system
+===
+AGENT bot
+  SYSTEM ./system.md
+---
+(source_file
+  (agent_declaration
+    name: (identifier)
+    (agent_body
+      (system_directive
+        path: (path)))))
+
+===
+agent with properties
+===
+AGENT bot
+  model = "gpt-4"
+  temperature = 0.7
+  verbose = true
+---
+(source_file
+  (agent_declaration
+    name: (identifier)
+    (agent_body
+      (property
+        key: (identifier)
+        value: (string
+          (string_content)))
+      (property
+        key: (identifier)
+        value: (number))
+      (property
+        key: (identifier)
+        value: (boolean)))))
+
+===
+agent with system and properties
+===
+AGENT support
+  SYSTEM ./prompts/support.md
+  model = "gpt-4"
+  max_tokens = 1024
+---
+(source_file
+  (agent_declaration
+    name: (identifier)
+    (agent_body
+      (system_directive
+        path: (path))
+      (property
+        key: (identifier)
+        value: (string
+          (string_content)))
+      (property
+        key: (identifier)
+        value: (number)))))
+
+===
+agent body with comment
+===
+AGENT bot
+  # config
+  model = "gpt-4"
+---
+(source_file
+  (agent_declaration
+    name: (identifier)
+    (agent_body
+      (comment)
+      (property
+        key: (identifier)
+        value: (string
+          (string_content))))))

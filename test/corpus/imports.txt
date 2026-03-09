@@ -1,0 +1,50 @@
+===
+path import
+===
+IMPORT ./rules.hmn
+---
+(source_file
+  (import_statement
+    (path)))
+
+===
+relative parent path import
+===
+IMPORT ../shared/rules.hmn
+---
+(source_file
+  (import_statement
+    (path)))
+
+===
+package import
+===
+IMPORT safety
+---
+(source_file
+  (import_statement
+    (package)))
+
+===
+package import with slashes
+===
+IMPORT @acme/safety/rules
+---
+(source_file
+  (import_statement
+    (package)))
+
+===
+multiple imports
+===
+IMPORT ./rules.hmn
+IMPORT safety
+IMPORT ../shared.hmn
+---
+(source_file
+  (import_statement
+    (path))
+  (import_statement
+    (package))
+  (import_statement
+    (path)))

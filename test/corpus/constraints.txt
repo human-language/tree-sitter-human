@@ -1,0 +1,87 @@
+===
+all five constraint levels
+===
+CONSTRAINTS safety
+  NEVER lie to the user
+  MUST respond in English
+  SHOULD be concise
+  AVOID technical jargon
+  MAY use bullet points
+---
+(source_file
+  (constraints_block
+    name: (identifier)
+    (constraint
+      (constraint_level)
+      (constraint_text))
+    (constraint
+      (constraint_level)
+      (constraint_text))
+    (constraint
+      (constraint_level)
+      (constraint_text))
+    (constraint
+      (constraint_level)
+      (constraint_text))
+    (constraint
+      (constraint_level)
+      (constraint_text))))
+
+===
+constraint with numbers in text
+===
+CONSTRAINTS limits
+  MUST respond within 2 sentences
+  NEVER exceed 500 tokens
+---
+(source_file
+  (constraints_block
+    name: (identifier)
+    (constraint
+      (constraint_level)
+      (constraint_text))
+    (constraint
+      (constraint_level)
+      (constraint_text))))
+
+===
+comments inside constraints block
+===
+CONSTRAINTS rules
+  # general
+  MUST be polite
+  # safety
+  NEVER lie
+---
+(source_file
+  (constraints_block
+    name: (identifier)
+    (comment)
+    (constraint
+      (constraint_level)
+      (constraint_text))
+    (comment)
+    (constraint
+      (constraint_level)
+      (constraint_text))))
+
+===
+multiple constraints blocks
+===
+CONSTRAINTS safety
+  NEVER lie
+
+CONSTRAINTS tone
+  SHOULD be friendly
+---
+(source_file
+  (constraints_block
+    name: (identifier)
+    (constraint
+      (constraint_level)
+      (constraint_text)))
+  (constraints_block
+    name: (identifier)
+    (constraint
+      (constraint_level)
+      (constraint_text))))

@@ -75,7 +75,7 @@ module.exports = grammar({
       field("name", $.identifier),
       $._newline,
       $._indent,
-      repeat1($.constraint),
+      repeat1(choice($.constraint, $.comment)),
       $._dedent,
     ),
 
@@ -93,14 +93,14 @@ module.exports = grammar({
       "MAY",
     ),
 
-    constraint_text: $ => /[^\n\r]+/,
+    constraint_text: $ => token(prec(-2, /[^\n\r]+/)),
 
     flow_block: $ => seq(
       "FLOW",
       field("name", $.identifier),
       $._newline,
       $._indent,
-      repeat1($.flow_step),
+      repeat1(choice($.flow_step, $.comment)),
       $._dedent,
     ),
 
@@ -109,7 +109,7 @@ module.exports = grammar({
       $._newline,
     ),
 
-    step_text: $ => /[^\n\r]+/,
+    step_text: $ => token(prec(-2, /[^\n\r]+/)),
 
     test_block: $ => seq(
       "TEST",
@@ -122,6 +122,7 @@ module.exports = grammar({
     _test_entry: $ => choice(
       $.test_input,
       $.test_expect,
+      $.comment,
     ),
 
     test_input: $ => seq(
@@ -142,7 +143,7 @@ module.exports = grammar({
 
     path: $ => /\.\.?\/[^\n\r \t]*/,
 
-    package: $ => /[a-zA-Z][a-zA-Z0-9._\/-]*/,
+    package: $ => /[@a-zA-Z][a-zA-Z0-9._\/@-]*/,
 
     string: $ => seq(
       '"',
@@ -152,10 +153,10 @@ module.exports = grammar({
 
     string_content: $ => /([^"\\]|\\["\\])+/,
 
-    number: $ => /[0-9]+(\.[0-9]+)?/,
+    number: $ => /-?[0-9]+(\.[0-9]+)?/,
 
     boolean: $ => choice("true", "false"),
 
-    comment: $ => seq(token.immediate(/#/), /[^\n\r]*/),
+    comment: $ => seq("#", /[^\n\r]*/, $._newline),
   },
 });

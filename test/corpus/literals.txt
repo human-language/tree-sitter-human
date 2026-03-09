@@ -1,0 +1,141 @@
+===
+string literal
+===
+AGENT bot
+  name = "support bot"
+---
+(source_file
+  (agent_declaration
+    name: (identifier)
+    (agent_body
+      (property
+        key: (identifier)
+        value: (string
+          (string_content))))))
+
+===
+string with escapes
+===
+AGENT bot
+  greeting = "say \"hello\""
+---
+(source_file
+  (agent_declaration
+    name: (identifier)
+    (agent_body
+      (property
+        key: (identifier)
+        value: (string
+          (string_content))))))
+
+===
+empty string
+===
+AGENT bot
+  prefix = ""
+---
+(source_file
+  (agent_declaration
+    name: (identifier)
+    (agent_body
+      (property
+        key: (identifier)
+        value: (string)))))
+
+===
+integer
+===
+AGENT bot
+  max_tokens = 1024
+---
+(source_file
+  (agent_declaration
+    name: (identifier)
+    (agent_body
+      (property
+        key: (identifier)
+        value: (number)))))
+
+===
+negative integer
+===
+AGENT bot
+  offset = -1
+---
+(source_file
+  (agent_declaration
+    name: (identifier)
+    (agent_body
+      (property
+        key: (identifier)
+        value: (number)))))
+
+===
+float
+===
+AGENT bot
+  temperature = 0.7
+---
+(source_file
+  (agent_declaration
+    name: (identifier)
+    (agent_body
+      (property
+        key: (identifier)
+        value: (number)))))
+
+===
+negative float
+===
+AGENT bot
+  bias = -0.5
+---
+(source_file
+  (agent_declaration
+    name: (identifier)
+    (agent_body
+      (property
+        key: (identifier)
+        value: (number)))))
+
+===
+boolean true
+===
+AGENT bot
+  verbose = true
+---
+(source_file
+  (agent_declaration
+    name: (identifier)
+    (agent_body
+      (property
+        key: (identifier)
+        value: (boolean)))))
+
+===
+boolean false
+===
+AGENT bot
+  debug = false
+---
+(source_file
+  (agent_declaration
+    name: (identifier)
+    (agent_body
+      (property
+        key: (identifier)
+        value: (boolean)))))
+
+===
+path value
+===
+AGENT bot
+  config = ./config.json
+---
+(source_file
+  (agent_declaration
+    name: (identifier)
+    (agent_body
+      (property
+        key: (identifier)
+        value: (path)))))
