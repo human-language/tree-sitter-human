@@ -1,0 +1,19 @@
+{
+  "grammars": [
+    {
+      "name": "hmn",
+      "camelcase": "Hmn",
+      "scope": "source.hmn",
+      "path": ".",
+      "file-types": ["hmn"],
+      "injection-regex": "^hmn$",
+      "highlights": "queries/highlights.scm",
+      "external-files": ["src/scanner.c"]
+    }
+  ],
+  "metadata": {
+    "version": "0.1.0",
+    "license": "MIT",
+    "description": "Tree-sitter grammar for the Human language (.hmn)"
+  }
+}

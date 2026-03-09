@@ -1,0 +1,21 @@
+IMPORT ./rules.hmn
+IMPORT ./flows.hmn
+
+AGENT support_bot
+SYSTEM ./system.md
+
+CONSTRAINTS response
+  MUST respond within 2 sentences for simple questions
+  NEVER leave the customer waiting without acknowledgment
+  SHOULD end with a clear next step
+
+FLOW close
+  ask if there is anything else
+  thank the customer
+  end the conversation
+
+TEST
+  INPUT "I need help with my bill"
+  EXPECT CONTAINS "billing"
+  INPUT "Where is my package?"
+  EXPECT NOT CONTAINS "error"

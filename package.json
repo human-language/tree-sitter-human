@@ -1,0 +1,14 @@
+{
+  "name": "tree-sitter-hmn",
+  "version": "0.1.0",
+  "description": "Tree-sitter grammar for the Human language",
+  "main": "bindings/node",
+  "scripts": {
+    "build": "tree-sitter generate && node-gyp build",
+    "test": "tree-sitter test",
+    "parse": "tree-sitter parse"
+  },
+  "devDependencies": {
+    "tree-sitter-cli": "^0.25.0"
+  }
+}
