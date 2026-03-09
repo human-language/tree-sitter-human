@@ -40,3 +40,10 @@ AGENT bot
   (comment)
   (agent_declaration
     name: (identifier)))
+
+===
+empty file
+===
+
+---
+(source_file)

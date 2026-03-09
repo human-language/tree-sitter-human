@@ -14,7 +14,7 @@
 ] @keyword
 
 ; Constraint levels
-(constraint_level) @keyword.modifier
+(constraint_level) @keyword
 
 ; Block names
 (agent_declaration name: (identifier) @type)
@@ -29,7 +29,6 @@
 
 ; Literals
 (string) @string
-(string_content) @string
 (number) @number
 (boolean) @constant.builtin
 (path) @string.special.path

@@ -85,3 +85,16 @@ CONSTRAINTS tone
     (constraint
       (constraint_level)
       (constraint_text))))
+
+===
+comment only constraints block
+===
+CONSTRAINTS notes
+  # just a comment
+  # another comment
+---
+(source_file
+  (constraints_block
+    name: (identifier)
+    (comment)
+    (comment)))

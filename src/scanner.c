@@ -86,9 +86,9 @@ bool tree_sitter_hmn_external_scanner_scan(
   if (s->has_pending) {
     uint16_t indent = s->pending_indent;
     uint16_t current = s->stack[s->depth - 1];
-    s->has_pending = false;
 
     if (indent > current && valid_symbols[INDENT]) {
+      s->has_pending = false;
       if (s->depth < MAX_DEPTH) {
         s->stack[s->depth] = indent;
         s->depth++;
@@ -98,6 +98,7 @@ bool tree_sitter_hmn_external_scanner_scan(
     }
 
     if (indent < current && valid_symbols[DEDENT]) {
+      s->has_pending = false;
       uint8_t pops = 0;
       while (s->depth > 1 && s->stack[s->depth - 1] > indent) {
         s->depth--;
@@ -110,7 +111,12 @@ bool tree_sitter_hmn_external_scanner_scan(
       return true;
     }
 
-    /* Same indent level -- no token to emit. */
+    if (indent == current) {
+      s->has_pending = false;
+      return false;
+    }
+
+    /* valid_symbols didn't match -- keep pending for next call. */
     return false;
   }
 
